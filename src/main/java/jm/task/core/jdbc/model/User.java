@@ -17,7 +17,6 @@ public class User {
                 ", age=" + age +
                 '}';
     }
-
     @Id
     private Long id;
 

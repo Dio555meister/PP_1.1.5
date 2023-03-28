@@ -67,7 +67,6 @@ public class UserDaoJDBCImpl implements UserDao {
         }
 
     }
-
     @Override
     public void removeUserById(long id) {
         try {

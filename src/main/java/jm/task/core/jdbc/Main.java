@@ -18,8 +18,5 @@ public class Main {
         System.out.println(userService.getAllUsers().toString());
         userService.createUsersTable();
         userService.dropUsersTable();
-
-
-        // реализуйте алгоритм здесь
     }
 }
