@@ -11,9 +11,6 @@ import java.util.List;
 import static jm.task.core.jdbc.util.Util.getConnection;
 
 public class UserDaoJDBCImpl implements UserDao {
-    public UserDaoJDBCImpl() {
-    }
-
     Connection connection = Util.getConnection();
 
     @Override
@@ -30,11 +27,10 @@ public class UserDaoJDBCImpl implements UserDao {
                 exception.printStackTrace();
             }
         }
-
     }
 
     @Override
-    public void dropUsersTable() { // если нет таблицы - ексепшен
+    public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("DROP TABLE IF EXISTS users");
             connection.commit();
@@ -46,17 +42,20 @@ public class UserDaoJDBCImpl implements UserDao {
                 exception.printStackTrace();
             }
         }
-
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("INSERT INTO users (name, lastName, age )" +
-                                    " VALUES ('" + name + "', '" + lastName + "', '" + age + "')");
+        String sql = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setString(2, lastName);
+            statement.setByte(3, age);
+            statement.executeUpdate();
 
             connection.commit();
-            System.out.println(" User " + name + " " + lastName + " " + age + " " + " dobavlen ");
+            System.out.println("User " + name + " " + lastName + " " + age + " " + "добавлен");
         } catch (SQLException e) {
             e.printStackTrace();
             try {
@@ -65,12 +64,12 @@ public class UserDaoJDBCImpl implements UserDao {
                 exception.printStackTrace();
             }
         }
-
     }
+
     @Override
     public void removeUserById(long id) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM  user WHERE id = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM  users WHERE id = ?");
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             connection.commit();
@@ -82,7 +81,6 @@ public class UserDaoJDBCImpl implements UserDao {
                 exception.printStackTrace();
             }
         }
-
     }
 
     @Override
@@ -101,7 +99,6 @@ public class UserDaoJDBCImpl implements UserDao {
                 User user = new User(name, lastName, age);
                 user.setId(id);
                 users.add(user);
-
             }
             connection.commit();
         } catch (SQLException e) {
@@ -116,7 +113,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     @Override
-    public void cleanUsersTable() { // транзакции роллбэк
+    public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("TRUNCATE TABLE users");
             connection.commit();
@@ -128,7 +125,6 @@ public class UserDaoJDBCImpl implements UserDao {
                 exception.printStackTrace();
             }
         }
-
     }
-
 }
+
